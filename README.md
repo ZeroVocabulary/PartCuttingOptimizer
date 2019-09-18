@@ -1,8 +1,8 @@
 # PartCuttingOptimizer
 
 Made without online help, theres probably a better way to do it but I wanted to do it on my own.
-You need many different parts of different lengths, which will be cut from a long, single length tube that you can buy.
-What is the minimum number of the single length tubes you could buy and still get all your parts?
+You need many different parts of different lengths, which will be cut from a long, single length part that you can buy.
+What is the minimum number of the single length parts you could buy and still get all your parts?
  
 Example Run of CutParts.py:
 ```
