@@ -1,42 +1,46 @@
 from decimal import Decimal
-
+import numpy as np
 debug = False
+class Cut:
+	CutNumber:int
+	CutSize:int
+	def __init__(self,cutNumber:int,cutSize:int):
+		self.CutNumber=cutNumber
+		self.CutSize=cutSize
 
 def main():
-	y = Decimal(input("Length of buyable part: ").strip(" "))
-	cont = True
-	inputParts = []
-	while(cont):
-		temp = input('Add part length, or "end" to finish adding parts: ')
-		if temp.strip(" ") == "end":
-			cont = False
-		elif temp.strip(" ") == "":
-			pass
-		else:
-			inputParts.append(Decimal(temp.strip(" ")))
-	buys, sets, excess = findParts(y, inputParts)
+	y = 5600
+	cuts=[Cut(1,2256),Cut(1,2256),Cut(1,963),Cut(1,963),
+	Cut(2,1846),Cut(2,1846),Cut(2,936),Cut(2,936)
+	]
+	buys, sets, excess = findParts(y, cuts)
 	print("buys: {}".format(buys))
 	print("sets:")
+
+	templist=[]
+	tt=[]
+	
 	for i in range(len(sets)):
-		print(sets[i])
+		tt=[]
+		for cut in sets[i]:
+			tt.append("({0},{1})".format(cut.CutNumber,cut.CutSize))
+		templist.append(tt)
+	for i in templist:
+		print(i)
+		#print(sets[i],np.sum(sets[i]))
+        
+
 	print("excess:")
 	for i in range(len(excess)):
 		print(excess[i])
 
 
 
-
-# test case: max 10: 5 4 3 2
-# test case: max 10: 5 5 4
-# test case: max 10: 10 9 8 7 6 5 4 3 2 1
-#	[10], [9,1], [8,2], [7,3], [6,4], [5]
-
-
-
 # this should set up the recursion
-def findParts(maxLength, partsList):
-	partsList.sort()
-	partsList.reverse()
+def findParts(maxLength:int, partsList:list[Cut]):
+	partsList.sort(key=lambda x: x.CutSize, reverse=True)
+	#partsList.reverse() #already reversed
+
 	buys = 0
 	currPartsList = partsList #not a copy
 	sets = []
@@ -46,7 +50,7 @@ def findParts(maxLength, partsList):
 		if debug:print("<==================================")
 		asdf, bestSet, bestRemaining, diff = findRecursive(maxLength, [], partsList.copy())
 		if debug:print("==================================>")
-		excess.append(maxLength - sum(bestSet))
+		excess.append(maxLength - sum(x.CutSize for x in  bestSet))
 		sets.append(bestSet.copy())
 		while len(bestSet) > 0:
 			partsList.remove(bestSet.pop())
@@ -55,20 +59,19 @@ def findParts(maxLength, partsList):
 
 
 # for the currSet, find a part to add
-# max length isn't ever changed, I'm just too lazy to create a class
-def findRecursive(maxLength, currSet, currRemaining):
+def findRecursive(maxLength, currSet:list[Cut], currRemaining:list[Cut]):
 	if debug:
 		print("========currSet:")
 		print(currSet)
 		print("currRemaining")
 		print(currRemaining)
 	if len(currRemaining) == 0:
-		return maxLength, currSet, currRemaining, maxLength - sum(currSet) 
+		return maxLength, currSet, currRemaining, maxLength - sum(x.CutSize for x in  currSet) 
 	bestSet = currSet
 	bestRemaining = currRemaining
 	diff = 10000 # high number
 	for i in range(len(currRemaining)):
-		if(sum(currSet) + currRemaining[i] > maxLength):
+		if(sum(x.CutSize for x in currSet) + currRemaining[i].CutSize > maxLength):
 			pass
 		else:
 			currSet2 = currSet.copy()
@@ -86,7 +89,7 @@ def findRecursive(maxLength, currSet, currRemaining):
 				if debug:
 					print("diff is equal to 0")
 				return maxLength, bestSet, bestRemaining, diff
-	diff = maxLength - sum(currSet)
+	diff = maxLength - sum(x.CutSize for x in currSet)
 	return maxLength, bestSet, bestRemaining, diff
 
 
